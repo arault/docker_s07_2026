@@ -1,4 +1,11 @@
 ---
+x-logging: &default-logging
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: 5
+
 name: lemp-proxy
 services:
   www:
@@ -19,9 +26,13 @@ services:
       - traefik.enable=true
       - traefik.docker.network=proxynet
       - traefik.http.routers.www.rule=Host(`www.stage.local`)
+    <<: *default-logging
 
   php:
     image: ${PHP_IMAGE}:${PHP_IMAGE_TAG}
+    build:
+      context: ../03_dockerfile/
+      dockerfile: Dockerfile
     container_name: php
     networks:
       lempnet:
@@ -29,6 +40,7 @@ services:
     volumes:
       - ./html:/var/www/html
     restart: unless-stopped
+    <<: *default-logging
 
   db:
     image: mariadb:${MARIADB_IMAGE_TAG}
@@ -42,6 +54,7 @@ services:
     # env_file: ./mariadb.env
     environment:
       - MARIADB_ROOT_PASSWORD=${DB_ROOT_PWD}
+    <<: *default-logging
 
 volumes:
   datadb:
