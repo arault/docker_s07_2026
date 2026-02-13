@@ -1,0 +1,11 @@
+---
+#name: whoami-swarm
+services:
+  whoami:
+    image: traefik/whoami
+    # container_name: who
+    ports:
+      - 80:80
+    # restart: unless-stopped
+    deploy:
+      replicas: 2
